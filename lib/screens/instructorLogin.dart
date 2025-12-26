@@ -87,7 +87,17 @@ class _SignInState extends State<DoctorSignIn> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                  alignment: Alignment.bottomRight,
+                  child: TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      "Forget Password?",
+                      style: GoogleFonts.poppins(color: Colors.white),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
                   child: ElevatedButton(
                     onPressed: () {},
                     style: ButtonStyle(
