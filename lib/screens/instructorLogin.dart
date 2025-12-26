@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class DoctorSignIn extends StatefulWidget {
-  const DoctorSignIn({super.key});
+class Instructorlogin extends StatefulWidget {
+  const Instructorlogin({super.key});
 
   @override
-  State<DoctorSignIn> createState() => _SignInState();
+  State<Instructorlogin> createState() => _SignInState();
 }
 
-class _SignInState extends State<DoctorSignIn> {
+class _SignInState extends State<Instructorlogin> {
   final key = GlobalKey<FormState>();
   String pass = "";
   bool obscure = true;
@@ -99,7 +99,9 @@ class _SignInState extends State<DoctorSignIn> {
                 Container(
                   margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context ,'/instructordashborad');
+                    },
                     style: ButtonStyle(
                       backgroundColor: WidgetStatePropertyAll(Colors.blue),
                       foregroundColor: WidgetStatePropertyAll(Colors.white),
