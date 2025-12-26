@@ -49,8 +49,43 @@ class _InstructordashboradState extends State<Instructordashborad> {
                   ),
                 ),
                 Spacer(),
-                Container(alignment: Alignment.bottomRight,child: IconButton(onPressed: (){}, icon: Icon(Icons.notifications,color: Colors.white,),))
+                Container(
+                  alignment: Alignment.bottomRight,
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.notifications, color: Colors.white),
+                  ),
+                ),
               ],
+            ),
+          ),
+          ListTile(
+            title: Container(
+              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: Color(0xFF0F2D4A),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: Color(0xFF1E6DD8), width: 1),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.auto_awesome,
+                    color: const Color(0xFF1E6DD8),
+                    size: 16,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    "INTELLICLASS AI: ONLINE",
+                    style: GoogleFonts.poppins(
+                      color: const Color(0xFF1E6DD8),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
