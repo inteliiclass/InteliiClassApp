@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "508773933300",
+    "project_id": "inteliiclass",
+    "storage_bucket": "inteliiclass.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:508773933300:android:b3cca4552fc820b9a3fea1",
+        "android_client_info": {
+          "package_name": "com.example.inteliiclass"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBM5HnHb7Z8let3Egogt_DvPDC01qunrRg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
