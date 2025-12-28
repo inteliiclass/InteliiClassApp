@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:inteliiclass/screens/instructorLogin.dart';
 import 'package:inteliiclass/screens/instructordashborad.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:inteliiclass/screens/studentLogin.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes: {
-        '/': (context) => Instructorlogin(),
+        '/': (context) => Studentlogin(),
         '/instructordashborad': (context) => Instructordashborad(),
       },
       theme: ThemeData(
