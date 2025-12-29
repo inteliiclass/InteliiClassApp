@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:inteliiclass/screens/instructorLogin.dart';
 import 'package:inteliiclass/screens/instructordashborad.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:inteliiclass/screens/roleSelection.dart';
 import 'package:inteliiclass/screens/studentLogin.dart';
 import 'firebase_options.dart';
 
@@ -20,11 +21,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes: {
-        '/': (context) => Studentlogin(),
+        '/': (context) => Roleselection(),
         '/instructordashborad': (context) => Instructordashborad(),
+        '/instructorlogin': (context) => Instructorlogin(),
+        '/studentlogin': (context) => Studentlogin(),
       },
       theme: ThemeData(
-        cardTheme: CardThemeData(color: const Color.fromARGB(255, 35, 35, 37)),
+        cardTheme: CardThemeData(color:  Color.fromARGB(255, 4, 48, 85),),
         inputDecorationTheme: InputDecorationThemeData(
           labelStyle: GoogleFonts.poppins(color: Colors.white),
           border: OutlineInputBorder(
