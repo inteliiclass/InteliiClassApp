@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inteliiclass/screens/instructorLogin.dart';
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
         '/instructordashborad': (context) => Instructordashborad(),
       },
       theme: ThemeData(
+        cardTheme: CardThemeData(color: const Color.fromARGB(255, 35, 35, 37)),
         inputDecorationTheme: InputDecorationThemeData(
           labelStyle: GoogleFonts.poppins(color: Colors.white),
           border: OutlineInputBorder(

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -129,8 +130,45 @@ class _SignInState extends State<Instructorlogin> {
                   Container(
                     margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/instructordashborad');
+                      onPressed: () async {
+                        if ((key.currentState!.validate())) {
+                          try {
+                            await FirebaseAuth.instance
+                                .signInWithEmailAndPassword(
+                                  email: emailcontroller.text.trim(),
+                                  password: passwordcontroller.text,
+                                );
+                            Navigator.pushNamed(
+                              context,
+                              '/instructordashborad',
+                            );
+                          } on FirebaseAuthException catch (e) {
+                            String message;
+                            switch (e.code) {
+                              case 'invalid-email':
+                                message = 'Invalid email address.';
+                                break;
+                              case 'user-disabled':
+                                message = 'User account is disabled.';
+                                break;
+                              case 'user-not-found':
+                                message = 'No user found for that email.';
+                                break;
+                              case 'wrong-password':
+                                message = 'Incorrect password.';
+                                break;
+                              default:
+                                message = e.message ?? 'Sign-in failed.';
+                            }
+                            ScaffoldMessenger.of(
+                              context,
+                            ).showSnackBar(SnackBar(content: Text(message)));
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Unexpected error: $e')),
+                            );
+                          }
+                        }
                       },
                       style: ButtonStyle(
                         backgroundColor: WidgetStatePropertyAll(Colors.blue),

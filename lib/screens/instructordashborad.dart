@@ -13,6 +13,7 @@ class _InstructordashboradState extends State<Instructordashborad> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView(
+        padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
         children: [
           ListTile(
             title: Row(
@@ -59,33 +60,130 @@ class _InstructordashboradState extends State<Instructordashborad> {
               ],
             ),
           ),
+
           ListTile(
-            title: Container(
-              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: Color(0xFF0F2D4A),
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: Color(0xFF1E6DD8), width: 1),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.auto_awesome,
-                    color: const Color(0xFF1E6DD8),
-                    size: 16,
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: EdgeInsets.fromLTRB(10, 25, 0, 0),
+                  child: Text(
+                    "Quick Actions",
+                    style: GoogleFonts.poppins(color: Colors.white),
                   ),
-                  const SizedBox(width: 6),
-                  Text(
-                    "INTELLICLASS AI: ONLINE",
-                    style: GoogleFonts.poppins(
-                      color: const Color(0xFF1E6DD8),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
+                ),
+                GridView.count(
+                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                  shrinkWrap: true,
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 1,
+                  children: [
+                    GestureDetector(
+                      child: Card(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+
+                            children: [
+                              Icon(
+                                Icons.play_circle_fill,
+                                color: Colors.blue,
+                                size: 45,
+                              ),
+                              Container(
+                                margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                child: Text(
+                                  "Start Lecture",
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      onTap: () {},
                     ),
-                  ),
-                ],
-              ),
+                    GestureDetector(
+                      child: Card(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.assignment_ind,
+                                color: Colors.deepPurple,
+                                size: 45,
+                              ),
+                              Container(
+                                margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                child: Text(
+                                  "Attendance",
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      onTap: () {},
+                    ),
+                    GestureDetector(
+                      child: Card(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.quiz, color: Colors.amber, size: 45),
+                              Container(
+                                margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                child: Text(
+                                  "Generate Quiz",
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      onTap: () {},
+                    ),
+                    GestureDetector(
+                      child: Card(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.assignment_turned_in,
+                                color: Colors.green,
+                                size: 45,
+                              ),
+                              Container(
+                                margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                child: Text(
+                                  "Assignment",
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      onTap: () {},
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
