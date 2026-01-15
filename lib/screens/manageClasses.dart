@@ -56,140 +56,8 @@ class _ManageClassesState extends State<ManageClasses> {
     final TextEditingController codeController = TextEditingController();
     final TextEditingController subjectController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: const Color.fromARGB(255, 4, 48, 85),
-          title: Text(
-            'Create New Class',
-            style: GoogleFonts.poppins(color: Colors.white),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameController,
-                  style: TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Class Name',
-                    hintText: 'e.g., Flutter Development',
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: codeController,
-                  style: TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Class Code',
-                    hintText: 'e.g., CS202',
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: subjectController,
-                  style: TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Subject',
-                    hintText: 'e.g., Mobile Development',
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: descriptionController,
-                  style: TextStyle(color: Colors.white),
-                  maxLines: 3,
-                  decoration: InputDecoration(
-                    labelText: 'Description',
-                    hintText: 'Enter class description',
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text(
-                'Cancel',
-                style: GoogleFonts.poppins(color: Colors.grey),
-              ),
-            ),
-            ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.blue),
-              ),
-              onPressed: () async {
-                if (nameController.text.isNotEmpty &&
-                    codeController.text.isNotEmpty) {
-                  final userProvider = Provider.of<UserProvider>(
-                    context,
-                    listen: false,
-                  );
-                  final classProvider = Provider.of<ClassProvider>(
-                    context,
-                    listen: false,
-                  );
-
-                  final instructorId =
-                      userProvider.currentUser?.uid ??
-                      FirebaseAuth.instance.currentUser?.uid ??
-                      '';
-                  final instructorName =
-                      userProvider.currentUser?.name ?? 'Instructor';
-
-                  final id = FirebaseFirestore.instance
-                      .collection('classes')
-                      .doc()
-                      .id;
-                  final now = DateTime.now();
-                  final newClass = ClassModel(
-                    classId: id,
-                    className: nameController.text,
-                    description: descriptionController.text,
-                    instructorId: instructorId,
-                    instructorName: instructorName,
-                    studentIds: [],
-                    subject: subjectController.text,
-                    classCode: codeController.text,
-                    createdAt: now,
-                    updatedAt: now,
-                  );
-
-                  try {
-                    await classProvider.addClass(newClass);
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Class created successfully!'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                    setState(() {});
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Error: $e'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                }
-              },
-              child: Text(
-                'Create',
-                style: GoogleFonts.poppins(color: Colors.white),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
+      }
+    
 
   void _deleteClass(int index) {
     final classProvider = Provider.of<ClassProvider>(context, listen: false);
@@ -331,45 +199,7 @@ class _ManageClassesState extends State<ManageClasses> {
                         ],
                       ),
                     ),
-                    PopupMenuButton<int>(
-                      icon: Icon(Icons.more_vert, color: Colors.white),
-                      color: const Color.fromARGB(255, 4, 48, 85),
-                      onSelected: (value) {
-                        if (value == 0) {
-                          // Edit action: placeholder for future edit flow
-                        } else if (value == 1) {
-                          _deleteClass(index);
-                        }
-                      },
-                      itemBuilder: (context) => [
-                        PopupMenuItem(
-                          value: 0,
-                          child: Row(
-                            children: [
-                              Icon(Icons.edit, color: Colors.white, size: 20),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Edit',
-                                style: GoogleFonts.poppins(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: 1,
-                          child: Row(
-                            children: [
-                              Icon(Icons.delete, color: Colors.white, size: 20),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Delete',
-                                style: GoogleFonts.poppins(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                    
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -497,11 +327,6 @@ class _ManageClassesState extends State<ManageClasses> {
               return _buildClassCard(entry.key, entry.value);
             }).toList(),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showCreateClassDialog,
-        backgroundColor: Colors.blue,
-        child: Icon(Icons.add, color: Colors.white),
       ),
     );
   }

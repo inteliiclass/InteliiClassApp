@@ -44,7 +44,10 @@ class _InstructordashboradState extends State<Instructordashborad> {
         Navigator.pushNamed(context, '/classdetails', arguments: course);
       },
       child: Card(
+        color: const Color(0xFF0F1A26),
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        elevation: 2,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -53,11 +56,11 @@ class _InstructordashboradState extends State<Instructordashborad> {
                 width: 78,
                 height: 78,
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 2, 20, 34),
-                  borderRadius: BorderRadius.circular(14),
+                  color: const Color.fromARGB(255, 6, 28, 46),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
-                  child: Icon(Icons.school, color: Colors.white, size: 40),
+                  child: Icon(Icons.school, color: Colors.white, size: 36),
                 ),
               ),
               const SizedBox(width: 16),
@@ -77,7 +80,7 @@ class _InstructordashboradState extends State<Instructordashborad> {
                     Text(
                       "${course.subject}",
                       style: GoogleFonts.poppins(
-                        color: Colors.white,
+                        color: Colors.white70,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -85,6 +88,7 @@ class _InstructordashboradState extends State<Instructordashborad> {
                   ],
                 ),
               ),
+              Icon(Icons.chevron_right, color: Colors.white54),
             ],
           ),
         ),
@@ -136,7 +140,7 @@ class _InstructordashboradState extends State<Instructordashborad> {
                         "Good Morning,",
                         style: GoogleFonts.poppins(color: Colors.grey),
                       ),
-                        Text(
+                      Text(
                         "Dr. ${userProvider.currentUser?.name ?? ''}",
                         style: GoogleFonts.poppins(
                           color: Colors.white,
@@ -177,111 +181,123 @@ class _InstructordashboradState extends State<Instructordashborad> {
                   crossAxisSpacing: 10,
                   childAspectRatio: 1,
                   children: [
-                    GestureDetector(
-                      child: Card(
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.play_circle_fill,
-                                color: Colors.blue,
-                                size: 45,
-                              ),
-                              Container(
-                                margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                child: Text(
-                                  "Start Lecture",
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/manageclasses');
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.play_circle_fill,
+                                  color: Colors.white,
+                                  size: 42,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  "Manage Classes",
                                   style: GoogleFonts.poppins(
                                     color: Colors.white,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                      onTap: () {
-                        Navigator.pushNamed(context, '/manageclasses');
-                      },
                     ),
-                    GestureDetector(
-                      child: Card(
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.assignment_ind,
-                                color: Colors.deepPurple,
-                                size: 45,
-                              ),
-                              Container(
-                                margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                child: Text(
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/attendance');
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF8E24AA), Color(0xFF5E35B1)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.assignment_ind,
+                                  color: Colors.white,
+                                  size: 42,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
                                   "Attendance",
                                   style: GoogleFonts.poppins(
                                     color: Colors.white,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                      onTap: () {
-                        Navigator.pushNamed(context, '/attendance');
-                      },
                     ),
-                    GestureDetector(
-                      child: Card(
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.quiz, color: Colors.amber, size: 45),
-                              Container(
-                                margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                child: Text(
-                                  "Generate Quiz",
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ],
+                    // 'Generate Quiz' action removed per request
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/assignmentlist');
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF43A047), Color(0xFF2E7D32)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        ),
-                      ),
-                      onTap: () {},
-                    ),
-                    GestureDetector(
-                      child: Card(
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.assignment_turned_in,
-                                color: Colors.green,
-                                size: 45,
-                              ),
-                              Container(
-                                margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                child: Text(
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.assignment_turned_in,
+                                  color: Colors.white,
+                                  size: 42,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
                                   "Assignment",
                                   style: GoogleFonts.poppins(
                                     color: Colors.white,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                      onTap: () {
-                        Navigator.pushNamed(context, '/assignmentlist');
-                      },
                     ),
                   ],
                 ),

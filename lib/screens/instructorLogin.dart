@@ -119,16 +119,7 @@ class _SignInState extends State<Instructorlogin> {
                       },
                     ),
                   ),
-                  Container(
-                    alignment: Alignment.bottomRight,
-                    child: TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        "Forget Password?",
-                        style: GoogleFonts.poppins(color: Colors.white),
-                      ),
-                    ),
-                  ),
+
                   Container(
                     margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
                     child: ElevatedButton(

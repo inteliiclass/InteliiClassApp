@@ -24,20 +24,20 @@ class AssignmentProvider extends ChangeNotifier {
 
     try {
       Query query = FirebaseFirestore.instance.collection('assignments');
-      
+
       if (classId != null) {
         query = query.where('classId', isEqualTo: classId);
       }
 
       final snapshot = await query.get();
       _assignments.clear();
-      
+
       for (var doc in snapshot.docs) {
         _assignments.add(
           AssignmentModel.fromMap(doc.data() as Map<String, dynamic>),
         );
       }
-      
+
       _isLoading = false;
       notifyListeners();
     } catch (e) {
@@ -83,11 +83,11 @@ class AssignmentProvider extends ChangeNotifier {
       final index = _assignments.indexWhere(
         (a) => a.assignmentId == assignment.assignmentId,
       );
-      
+
       if (index != -1) {
         _assignments[index] = assignment;
       }
-      
+
       _isLoading = false;
       notifyListeners();
     } catch (e) {

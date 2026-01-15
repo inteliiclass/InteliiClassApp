@@ -63,7 +63,7 @@ class _SignInState extends State<Studentlogin> {
                       cursorColor: Colors.white,
                       decoration: InputDecoration(
                         labelText: "Email",
-                        hintText: "instructor@gmail.com",
+                        hintText: "student@gmail.com",
                         icon: Icon(Icons.email),
                       ),
 
@@ -119,16 +119,7 @@ class _SignInState extends State<Studentlogin> {
                       },
                     ),
                   ),
-                  Container(
-                    alignment: Alignment.bottomRight,
-                    child: TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        "Forget Password?",
-                        style: GoogleFonts.poppins(color: Colors.white),
-                      ),
-                    ),
-                  ),
+                 
                   Container(
                     margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
                     child: ElevatedButton(
