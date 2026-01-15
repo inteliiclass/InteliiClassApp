@@ -23,7 +23,6 @@ class AssignmentModel {
     this.attachmentUrl,
   });
 
-  // Convert to Firestore document
   Map<String, dynamic> toMap() {
     return {
       'assignmentId': assignmentId,
@@ -39,14 +38,13 @@ class AssignmentModel {
     };
   }
 
-  // Create from Firestore document
   factory AssignmentModel.fromMap(Map<String, dynamic> map) {
     return AssignmentModel(
-      assignmentId: map['assignmentId'] ?? '',
-      classId: map['classId'] ?? '',
-      title: map['title'] ?? '',
-      description: map['description'] ?? '',
-      instructorId: map['instructorId'] ?? '',
+      assignmentId: map['assignmentId'],
+      classId: map['classId'],
+      title: map['title'],
+      description: map['description'],
+      instructorId: map['instructorId'],
       dueDate: map['dueDate']?.toDate() ?? DateTime.now(),
       createdAt: map['createdAt']?.toDate() ?? DateTime.now(),
       updatedAt: map['updatedAt']?.toDate() ?? DateTime.now(),

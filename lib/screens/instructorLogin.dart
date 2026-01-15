@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:inteliiclass/providers/user_provider.dart';
 
 class Instructorlogin extends StatefulWidget {
   const Instructorlogin({super.key});
@@ -131,42 +133,42 @@ class _SignInState extends State<Instructorlogin> {
                     margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
                     child: ElevatedButton(
                       onPressed: () async {
-                        if ((key.currentState!.validate())) {
+                        if (key.currentState!.validate()) {
                           try {
                             await FirebaseAuth.instance
                                 .signInWithEmailAndPassword(
                                   email: emailcontroller.text.trim(),
                                   password: passwordcontroller.text,
                                 );
-                            Navigator.pushNamed(
-                              context,
-                              '/instructordashborad',
-                            );
-                          } on FirebaseAuthException catch (e) {
-                            String message;
-                            switch (e.code) {
-                              case 'invalid-email':
-                                message = 'Invalid email address.';
-                                break;
-                              case 'user-disabled':
-                                message = 'User account is disabled.';
-                                break;
-                              case 'user-not-found':
-                                message = 'No user found for that email.';
-                                break;
-                              case 'wrong-password':
-                                message = 'Incorrect password.';
-                                break;
-                              default:
-                                message = e.message ?? 'Sign-in failed.';
+
+                            // Fetch user data after successful login
+                            if (context.mounted) {
+                              final userProvider = Provider.of<UserProvider>(
+                                context,
+                                listen: false,
+                              );
+                              final authUser =
+                                  FirebaseAuth.instance.currentUser;
+                              if (authUser != null) {
+                                await userProvider.fetchCurrentUser(
+                                  authUser.uid,
+                                  expectedRole: 'instructor',
+                                );
+                              }
+
+                              if (context.mounted) {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/instructordashborad',
+                                );
+                              }
                             }
-                            ScaffoldMessenger.of(
-                              context,
-                            ).showSnackBar(SnackBar(content: Text(message)));
                           } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Unexpected error: $e')),
-                            );
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(e.toString())),
+                              );
+                            }
                           }
                         }
                       },
