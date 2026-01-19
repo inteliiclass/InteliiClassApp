@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:inteliiclass/providers/class_provider.dart';
 import 'package:inteliiclass/models/class_model.dart';
+import 'package:inteliiclass/providers/user_provider.dart';
 
 
 class ManageClasses extends StatefulWidget {
@@ -14,109 +15,30 @@ class ManageClasses extends StatefulWidget {
 
 class _ManageClassesState extends State<ManageClasses> {
 
-  List<ClassModel> get _classesFromProvider {
-    final provider = Provider.of<ClassProvider>(context, listen: false);
-    return provider.classes;
+  late ClassProvider provider;
+  late UserProvider userProvider;
+  @override
+  void initState() {
+
+    super.initState();
+
+    provider = Provider.of<ClassProvider>(context, listen: false);
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+
+
+    if (userProvider.currentUser != null) {
+      provider.fetchClasses(instructorId: userProvider.currentUser!.uid);
+    }
+
+
+
   }
-
-
-  Widget _buildClassCard(int index, ClassModel classData) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, '/classdetails', arguments: classData);
-      },
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(Icons.class_, color: Colors.white, size: 30),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          classData.className,
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Text(
-                          classData.classCode ?? '',
-                          style: GoogleFonts.poppins(
-                            color: Colors.grey,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Icon(Icons.subject, color: Colors.grey, size: 16),
-                  const SizedBox(width: 4),
-                  Text(
-                    classData.subject,
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Column(
-                    children: [
-                      Text(
-                        '${classData.studentIds.length}',
-                        style: GoogleFonts.poppins(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 20,
-                        ),
-                      ),
-                      Text(
-                        'Students',
-                        style: GoogleFonts.poppins(
-                          color: Colors.grey,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    provider = Provider.of<ClassProvider>(context);
+    userProvider = Provider.of<UserProvider>(context);
+
+
     return Scaffold(
       backgroundColor: const Color(0xFF0B1220),
       appBar: AppBar(
@@ -133,7 +55,7 @@ class _ManageClassesState extends State<ManageClasses> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
-              'My Classes (${_classesFromProvider.length})',
+              'My Classes (${provider.classes.length})',
               style: GoogleFonts.poppins(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
@@ -142,7 +64,7 @@ class _ManageClassesState extends State<ManageClasses> {
             ),
           ),
           const SizedBox(height: 8),
-          if (_classesFromProvider.isEmpty)
+          if (provider.classes.isEmpty)
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(40),
@@ -158,21 +80,111 @@ class _ManageClassesState extends State<ManageClasses> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      'Tap + to create your first class',
-                      style: GoogleFonts.poppins(
-                        color: Colors.grey,
-                        fontSize: 14,
-                      ),
-                    ),
+
                   ],
                 ),
               ),
             )
           else
-            ..._classesFromProvider.asMap().entries.map((entry) {
-              return _buildClassCard(entry.key, entry.value);
-            }).toList(),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: provider.classes.length,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/classdetails',arguments: provider.classes[index]);
+                  },
+                  child: Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.blue,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Icon(Icons.class_, color: Colors.white, size: 30),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      provider.classes[index].className,
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      provider.classes[index].classCode ?? '',
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.grey,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Icon(Icons.subject, color: Colors.grey, size: 16),
+                              const SizedBox(width: 4),
+                              Text(
+                                provider.classes[index].subject,
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Column(
+                                children: [
+                                  Text(
+                                    '${ provider.classes[index].studentIds.length}',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.blue,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Students',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            )
         ],
       ),
     );

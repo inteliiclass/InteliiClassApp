@@ -8,12 +8,32 @@ class ClassDetails extends StatefulWidget {
 
   @override
   State<ClassDetails> createState() => _ClassDetailsState();
+
 }
 
 class _ClassDetailsState extends State<ClassDetails> {
   ClassModel? _classModel;
   bool _isLoading = true;
   List<UserModel> _students = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is ClassModel) {
+        setState(() {
+          _classModel = args;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
+  }
 
   Widget _buildStudentCard(UserModel? student, String id) {
     final displayName = student?.name ?? id;
@@ -72,7 +92,7 @@ class _ClassDetailsState extends State<ClassDetails> {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 4, 48, 85),
         title: Text(
-          _classModel?.className ?? 'Class Details',
+          'Class Details',
           style: GoogleFonts.poppins(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -80,133 +100,133 @@ class _ClassDetailsState extends State<ClassDetails> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-              padding: const EdgeInsets.fromLTRB(12, 16, 12, 16),
-              children: [
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
+        padding: const EdgeInsets.fromLTRB(12, 16, 12, 16),
+        children: [
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 78,
+                        height: 78,
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 2, 20, 34),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.book,
+                            color: Colors.white,
+                            size: 36,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              width: 78,
-                              height: 78,
-                              decoration: BoxDecoration(
-                                color: const Color.fromARGB(255, 2, 20, 34),
-                                borderRadius: BorderRadius.circular(14),
+                            Text(
+                              _classModel?.className ?? '',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 18,
                               ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.book,
-                                  color: Colors.white,
-                                  size: 36,
-                                ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              _classModel?.classCode ?? '',
+                              style: GoogleFonts.poppins(
+                                color: Colors.grey,
+                                fontSize: 14,
                               ),
                             ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    _classModel?.className ?? '',
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 18,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    _classModel?.classCode ?? '',
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.grey,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    'Dr. ${_classModel?.instructorName ?? ''}',
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    _classModel?.subject ?? '',
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ],
+                            const SizedBox(height: 6),
+                            Text(
+                              'Dr. ${_classModel?.instructorName ?? ''}',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              _classModel?.subject ?? '',
+                              style: GoogleFonts.poppins(
+                                color: Colors.grey,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
-                        Text(
-                          _classModel?.description ?? '',
-                          style: GoogleFonts.poppins(
-                            color: Colors.grey,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Students (${_classModel?.studentIds.length ?? 0})',
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.pushNamed(
-                          context,
-                          '/manageclasses',
-                          arguments: _classModel?.classId,
-                        ),
-                        icon: const Icon(Icons.add, color: Colors.blue),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 8),
-                ...(_classModel?.studentIds ?? []).map((id) {
-                  final user = _students.firstWhere(
-                    (u) => u.uid == id,
-                    orElse: () => UserModel(
-                      uid: id,
-                      email: '',
-                      name: id,
-                      role: 'student',
-                      phoneNumber: null,
-                      profileImageUrl: null,
-                      createdAt: DateTime.now(),
-                      updatedAt: DateTime.now(),
+                  const SizedBox(height: 12),
+                  Text(
+                    _classModel?.description ?? '',
+                    style: GoogleFonts.poppins(
+                      color: Colors.grey,
+                      fontSize: 14,
                     ),
-                  );
-                  return _buildStudentCard(
-                    user.uid == id && user.email == '' ? null : user,
-                    id,
-                  );
-                }).toList(),
-                const SizedBox(height: 20),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Students (${_classModel?.studentIds.length ?? 0})',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 18,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pushNamed(
+                    context,
+                    '/manageclasses',
+                    arguments: _classModel?.classId,
+                  ),
+                  icon: const Icon(Icons.add, color: Colors.blue),
+                ),
               ],
             ),
+          ),
+          const SizedBox(height: 8),
+          ...(_classModel?.studentIds ?? []).map((id) {
+            final user = _students.firstWhere(
+                  (u) => u.uid == id,
+              orElse: () => UserModel(
+                uid: id,
+                email: '',
+                name: id,
+                role: 'student',
+                phoneNumber: null,
+                profileImageUrl: null,
+                createdAt: DateTime.now(),
+                updatedAt: DateTime.now(),
+              ),
+            );
+            return _buildStudentCard(
+              user.uid == id && user.email == '' ? null : user,
+              id,
+            );
+          }).toList(),
+          const SizedBox(height: 20),
+        ],
+      ),
     );
   }
 }

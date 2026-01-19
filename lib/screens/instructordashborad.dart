@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:inteliiclass/models/class_model.dart';
+
 import 'package:provider/provider.dart';
 import 'package:inteliiclass/providers/class_provider.dart';
 import 'package:inteliiclass/providers/user_provider.dart';
@@ -11,70 +11,36 @@ class Instructordashborad extends StatefulWidget {
 
   @override
   State<Instructordashborad> createState() => _InstructordashboradState();
+
+
+
 }
 
 class _InstructordashboradState extends State<Instructordashborad> {
 
-  Widget buildCourseCard(ClassModel course) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, '/classdetails', arguments: course);
-      },
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 78,
-                height: 78,
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 2, 20, 34),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Center(
-                  child: Icon(Icons.school, color: Colors.white, size: 40),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      course.className,
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 18,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      "${course.subject}",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  late ClassProvider classProvider;
+  late UserProvider userProvider;
+@override
+  void initState() {
+  super.initState();
+  classProvider = Provider.of<ClassProvider>(context, listen: false);
+  userProvider = Provider.of<UserProvider>(context, listen: false);
+
+
+  if (userProvider.currentUser != null) {
+    classProvider.fetchClasses(instructorId: userProvider.currentUser!.uid);
   }
+
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    final classProvider = Provider.of<ClassProvider>(context);
-    final userProvider = Provider.of<UserProvider>(context);
+    classProvider = Provider.of<ClassProvider>(context);
+    userProvider = Provider.of<UserProvider>(context);
     Widget classSection;
-    
+
     if (classProvider.isLoading) {
       classSection = Center(
         child: Padding(
@@ -96,7 +62,57 @@ class _InstructordashboradState extends State<Instructordashborad> {
         physics: const NeverScrollableScrollPhysics(),
         itemCount: classProvider.classes.length,
         itemBuilder: (context, index) {
-          return buildCourseCard(classProvider.classes[index]);
+          return GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, '/classdetails', arguments:  classProvider.classes);
+            },
+            child: Card(
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 78,
+                      height: 78,
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 2, 20, 34),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Center(
+                        child: Icon(Icons.school, color: Colors.white, size: 40),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            classProvider.classes[index].className,
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 18,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            classProvider.classes[index].subject,
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
         },
       );
     }
@@ -117,11 +133,7 @@ class _InstructordashboradState extends State<Instructordashborad> {
                     shape: BoxShape.circle,
                     image: DecorationImage(
                       image:
-                          (userProvider.currentUser?.profileImageUrl != null &&
-                              userProvider
-                                  .currentUser!
-                                  .profileImageUrl!
-                                  .isNotEmpty)
+                          (userProvider.currentUser?.profileImageUrl != null )
                           ? NetworkImage(
                               userProvider.currentUser!.profileImageUrl!,
                             )
@@ -137,7 +149,7 @@ class _InstructordashboradState extends State<Instructordashborad> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Good Morning,",
+                        "Welcome,",
                         style: GoogleFonts.poppins(color: Colors.grey),
                       ),
                       Text(
@@ -150,14 +162,8 @@ class _InstructordashboradState extends State<Instructordashborad> {
                     ],
                   ),
                 ),
-                Spacer(),
-                Container(
-                  alignment: Alignment.bottomRight,
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.notifications, color: Colors.white),
-                  ),
-                ),
+
+
               ],
             ),
           ),
@@ -177,7 +183,6 @@ class _InstructordashboradState extends State<Instructordashborad> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   crossAxisCount: 2,
-                  mainAxisSpacing: 10,
                   crossAxisSpacing: 10,
                   childAspectRatio: 1,
                   children: [
@@ -195,7 +200,7 @@ class _InstructordashboradState extends State<Instructordashborad> {
                               Container(
                                 margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
                                 child: Text(
-                                  "Start Lecture",
+                                  "Manage Classes",
                                   style: GoogleFonts.poppins(
                                     color: Colors.white,
                                   ),
