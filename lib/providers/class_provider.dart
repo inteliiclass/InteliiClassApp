@@ -56,81 +56,20 @@ class ClassProvider extends ChangeNotifier {
     }
   }
 
-  
-  // Get a single class by ID
-  ClassModel? getClassById(String classId) {
-    try {
-      return _classes.firstWhere((c) => c.classId == classId);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  // Fetch a single class document by ID from Firestore and cache it
+  // Fetch a single class document by ID
   Future<ClassModel?> fetchClassById(String classId) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
     try {
-      // Try to get by document id first (some codebases store classId as doc id)
-      final docRef = FirebaseFirestore.instance
+      final query = await FirebaseFirestore.instance
           .collection('classes')
-          .doc(classId);
-      final doc = await docRef.get();
-      if (doc.exists) {
-        final classModel = ClassModel.fromMap(
-          doc.data() as Map<String, dynamic>,
-        );
+          .where('classId', isEqualTo: classId).get();
 
-        final index = _classes.indexWhere(
-          (c) => c.classId == classModel.classId,
-        );
-        if (index != -1) {
-          _classes[index] = classModel;
-        } else {
-          _classes.add(classModel);
-        }
+      if (query.docs.isEmpty) return null;
 
-        _isLoading = false;
-        notifyListeners();
-        return classModel;
-      }
-
-      // Fallback: query by the 'classId' field inside the document
-      final q = await FirebaseFirestore.instance
-          .collection('classes')
-          .where('classId', isEqualTo: classId)
-          .limit(1)
-          .get();
-
-      if (q.docs.isNotEmpty) {
-        final classModel = ClassModel.fromMap(
-          q.docs.first.data(),
-        );
-        final index = _classes.indexWhere(
-          (c) => c.classId == classModel.classId,
-        );
-        if (index != -1) {
-          _classes[index] = classModel;
-        } else {
-          _classes.add(classModel);
-        }
-
-        _isLoading = false;
-        notifyListeners();
-        return classModel;
-      }
-
-      _isLoading = false;
-      notifyListeners();
-      return null;
-    } catch (e) {
-      _errorMessage = e.toString();
-      _isLoading = false;
-      notifyListeners();
+      return ClassModel.fromMap(query.docs.single.data());
+    } catch (_) {
       return null;
     }
   }
+
 
 }
