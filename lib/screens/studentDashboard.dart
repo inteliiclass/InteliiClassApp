@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:inteliiclass/models/class_model.dart';
 import 'package:provider/provider.dart';
 import 'package:inteliiclass/providers/class_provider.dart';
 import 'package:inteliiclass/providers/user_provider.dart';
@@ -14,89 +13,6 @@ class StudentDashboard extends StatefulWidget {
 }
 
 class _StudentDashboardState extends State<StudentDashboard> {
-  Widget buildClassCard(ClassModel classData) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          '/studentclassdetails',
-          arguments: classData,
-        );
-      },
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(Icons.book, color: Colors.white, size: 30),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          classData.className,
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Icon(Icons.person, color: Colors.grey, size: 16),
-                  const SizedBox(width: 4),
-                  Flexible(
-                    child: Text(
-                      "Dr." " " + classData.instructorName,
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 14,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Icon(Icons.subject, color: Colors.grey, size: 16),
-                  const SizedBox(width: 4),
-                  Text(
-                    classData.subject,
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
- 
   @override
   void initState() {
     super.initState();
@@ -118,7 +34,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
             );
           }
         }
-       
       }
 
       await fetchAll();
@@ -129,7 +44,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final classProvider = Provider.of<ClassProvider>(context);
-  
+
     return Scaffold(
       backgroundColor: const Color(0xFF0B1220),
       body: ListView(
@@ -205,7 +120,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: classProvider.classes.length,
                   itemBuilder: (context, index) {
-                    return  GestureDetector(
+                    return GestureDetector(
                       onTap: () {
                         Navigator.pushNamed(
                           context,
@@ -214,7 +129,10 @@ class _StudentDashboardState extends State<StudentDashboard> {
                         );
                       },
                       child: Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Column(
@@ -229,15 +147,22 @@ class _StudentDashboardState extends State<StudentDashboard> {
                                       color: Colors.blue,
                                       borderRadius: BorderRadius.circular(10),
                                     ),
-                                    child: Icon(Icons.book, color: Colors.white, size: 30),
+                                    child: Icon(
+                                      Icons.book,
+                                      color: Colors.white,
+                                      size: 30,
+                                    ),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          classProvider.classes[index].className,
+                                          classProvider
+                                              .classes[index]
+                                              .className,
                                           style: GoogleFonts.poppins(
                                             color: Colors.white,
                                             fontWeight: FontWeight.w700,
@@ -254,11 +179,18 @@ class _StudentDashboardState extends State<StudentDashboard> {
                               const SizedBox(height: 12),
                               Row(
                                 children: [
-                                  Icon(Icons.person, color: Colors.grey, size: 16),
+                                  Icon(
+                                    Icons.person,
+                                    color: Colors.grey,
+                                    size: 16,
+                                  ),
                                   const SizedBox(width: 4),
                                   Flexible(
                                     child: Text(
-                                      "Dr." " " + classProvider.classes[index].instructorName,
+                                      "Dr. " +
+                                          classProvider
+                                              .classes[index]
+                                              .instructorName,
                                       style: GoogleFonts.poppins(
                                         color: Colors.white,
                                         fontSize: 14,
@@ -268,7 +200,11 @@ class _StudentDashboardState extends State<StudentDashboard> {
                                     ),
                                   ),
                                   const SizedBox(width: 16),
-                                  Icon(Icons.subject, color: Colors.grey, size: 16),
+                                  Icon(
+                                    Icons.subject,
+                                    color: Colors.grey,
+                                    size: 16,
+                                  ),
                                   const SizedBox(width: 4),
                                   Text(
                                     classProvider.classes[index].subject,
@@ -287,6 +223,18 @@ class _StudentDashboardState extends State<StudentDashboard> {
                   },
                 ),
           const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+              Navigator.pop(context);
+            },
+            style: ButtonStyle(
+              backgroundColor: WidgetStatePropertyAll(Colors.blue),
+              foregroundColor: WidgetStatePropertyAll(Colors.white),
+              fixedSize: WidgetStatePropertyAll(Size(370, 65)),
+            ),
+            child: Text("Log Out"),
+          ),
         ],
       ),
     );

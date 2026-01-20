@@ -216,9 +216,9 @@ class _ClassDetailsState extends State<ClassDetails> {
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _classModel?.studentIds?.length ?? 0,
+                  itemCount: _classModel?.studentIds.length ?? 0,
                   itemBuilder: (context, index) {
-                    final id = _classModel!.studentIds![index];
+                    final id = _classModel!.studentIds[index];
                     final user = _students.firstWhere(
                           (u) => u.uid == id,
                       orElse: () => UserModel(

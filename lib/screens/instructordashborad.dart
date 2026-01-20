@@ -1,6 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'package:provider/provider.dart';
 import 'package:inteliiclass/providers/class_provider.dart';
 import 'package:inteliiclass/providers/user_provider.dart';
@@ -139,7 +139,7 @@ class _InstructordashboradState extends State<Instructordashborad> {
                       fit: BoxFit.cover,
                     )
                         : null,
-                    color: Colors.grey,
+                    color: Colors.blue,
                   ),
                   child: userProvider.currentUser?.profileImageUrl == null
                       ? Icon(Icons.person, color: Colors.white, size: 35)
@@ -263,6 +263,18 @@ class _InstructordashboradState extends State<Instructordashborad> {
           ),
           classSection,
           const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+              Navigator.pop(context);
+            },
+            style: ButtonStyle(
+              backgroundColor: WidgetStatePropertyAll(Colors.blue),
+              foregroundColor: WidgetStatePropertyAll(Colors.white),
+              fixedSize: WidgetStatePropertyAll(Size(370, 65)),
+            ),
+            child: Text("Log Out"),
+          ),
         ],
       ),
     );

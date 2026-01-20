@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:inteliiclass/providers/class_provider.dart';
-import 'package:inteliiclass/models/class_model.dart';
 import 'package:inteliiclass/providers/user_provider.dart';
 
 
@@ -37,7 +36,6 @@ class _ManageClassesState extends State<ManageClasses> {
   Widget build(BuildContext context) {
     provider = Provider.of<ClassProvider>(context);
     userProvider = Provider.of<UserProvider>(context);
-
 
     return Scaffold(
       backgroundColor: const Color(0xFF0B1220),
