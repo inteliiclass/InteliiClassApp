@@ -4,7 +4,7 @@ import 'package:inteliiclass/models/class_model.dart';
 import 'package:provider/provider.dart';
 import 'package:inteliiclass/providers/class_provider.dart';
 import 'package:inteliiclass/providers/user_provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 
 class Instructordashborad extends StatefulWidget {
   const Instructordashborad({super.key});
@@ -14,29 +14,6 @@ class Instructordashborad extends StatefulWidget {
 }
 
 class _InstructordashboradState extends State<Instructordashborad> {
-  @override
-  void initState() {
-    super.initState();
-    // Fetch current user and then fetch their classes
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      final classProvider = Provider.of<ClassProvider>(context, listen: false);
-
-      // First ensure user is loaded, then fetch their classes
-      if (userProvider.currentUser != null) {
-        classProvider.fetchClasses(instructorId: userProvider.currentUser!.uid);
-      } else {
-        // If user not loaded, fetch the user first
-        final authUser = FirebaseAuth.instance.currentUser;
-        if (authUser != null) {
-          userProvider.fetchCurrentUser(authUser.uid).then((_) {
-            final uid = userProvider.currentUser?.uid ?? authUser.uid;
-            classProvider.fetchClasses(instructorId: uid);
-          });
-        }
-      }
-    });
-  }
 
   Widget buildCourseCard(ClassModel course) {
     return GestureDetector(
@@ -44,10 +21,7 @@ class _InstructordashboradState extends State<Instructordashborad> {
         Navigator.pushNamed(context, '/classdetails', arguments: course);
       },
       child: Card(
-        color: const Color(0xFF0F1A26),
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        elevation: 2,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -56,11 +30,11 @@ class _InstructordashboradState extends State<Instructordashborad> {
                 width: 78,
                 height: 78,
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 6, 28, 46),
-                  borderRadius: BorderRadius.circular(12),
+                  color: const Color.fromARGB(255, 2, 20, 34),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Center(
-                  child: Icon(Icons.school, color: Colors.white, size: 36),
+                  child: Icon(Icons.school, color: Colors.white, size: 40),
                 ),
               ),
               const SizedBox(width: 16),
@@ -80,7 +54,7 @@ class _InstructordashboradState extends State<Instructordashborad> {
                     Text(
                       "${course.subject}",
                       style: GoogleFonts.poppins(
-                        color: Colors.white70,
+                        color: Colors.white,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -88,7 +62,6 @@ class _InstructordashboradState extends State<Instructordashborad> {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right, color: Colors.white54),
             ],
           ),
         ),
@@ -100,6 +73,33 @@ class _InstructordashboradState extends State<Instructordashborad> {
   Widget build(BuildContext context) {
     final classProvider = Provider.of<ClassProvider>(context);
     final userProvider = Provider.of<UserProvider>(context);
+    Widget classSection;
+    
+    if (classProvider.isLoading) {
+      classSection = Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: CircularProgressIndicator(color: Colors.blue),
+        ),
+      );
+    } else if (classProvider.classes.isEmpty) {
+      classSection = Padding(
+        padding: const EdgeInsets.all(12),
+        child: Text(
+          'No classes yet',
+          style: GoogleFonts.poppins(color: Colors.grey),
+        ),
+      );
+    } else {
+      classSection = ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: classProvider.classes.length,
+        itemBuilder: (context, index) {
+          return buildCourseCard(classProvider.classes[index]);
+        },
+      );
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFF0B1220),
@@ -181,123 +181,61 @@ class _InstructordashboradState extends State<Instructordashborad> {
                   crossAxisSpacing: 10,
                   childAspectRatio: 1,
                   children: [
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: () {
-                          Navigator.pushNamed(context, '/manageclasses');
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.play_circle_fill,
-                                  color: Colors.white,
-                                  size: 42,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  "Manage Classes",
+                    GestureDetector(
+                      child: Card(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.play_circle_fill,
+                                color: Colors.blue,
+                                size: 45,
+                              ),
+                              Container(
+                                margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                child: Text(
+                                  "Start Lecture",
                                   style: GoogleFonts.poppins(
                                     color: Colors.white,
-                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/manageclasses');
+                      },
                     ),
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: () {
-                          Navigator.pushNamed(context, '/attendance');
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Color(0xFF8E24AA), Color(0xFF5E35B1)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.assignment_ind,
-                                  color: Colors.white,
-                                  size: 42,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
+                    GestureDetector(
+                      child: Card(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.assignment_ind,
+                                color: Colors.deepPurple,
+                                size: 45,
+                              ),
+                              Container(
+                                margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                child: Text(
                                   "Attendance",
                                   style: GoogleFonts.poppins(
                                     color: Colors.white,
-                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    ),
-                    // 'Generate Quiz' action removed per request
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: () {
-                          Navigator.pushNamed(context, '/assignmentlist');
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Color(0xFF43A047), Color(0xFF2E7D32)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.assignment_turned_in,
-                                  color: Colors.white,
-                                  size: 42,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  "Assignment",
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/attendance');
+                      },
                     ),
                   ],
                 ),
@@ -316,29 +254,7 @@ class _InstructordashboradState extends State<Instructordashborad> {
               ),
             ),
           ),
-          classProvider.isLoading
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: CircularProgressIndicator(color: Colors.blue),
-                  ),
-                )
-              : classProvider.classes.isEmpty
-              ? Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Text(
-                    'No classes yet',
-                    style: GoogleFonts.poppins(color: Colors.grey),
-                  ),
-                )
-              : ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: classProvider.classes.length,
-                  itemBuilder: (context, index) {
-                    return buildCourseCard(classProvider.classes[index]);
-                  },
-                ),
+          classSection,
           const SizedBox(height: 20),
         ],
       ),

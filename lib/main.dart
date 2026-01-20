@@ -8,18 +8,12 @@ import 'package:inteliiclass/screens/roleSelection.dart';
 import 'package:inteliiclass/screens/studentLogin.dart';
 import 'package:inteliiclass/screens/studentDashboard.dart';
 import 'package:inteliiclass/screens/classDetails.dart';
-import 'package:inteliiclass/screens/assignmentList.dart';
-import 'package:inteliiclass/screens/assignmentDetails.dart';
-import 'package:inteliiclass/screens/createAssignment.dart';
-import 'package:inteliiclass/screens/submitAssignment.dart';
 import 'package:inteliiclass/screens/attendanceScreen.dart';
 import 'package:inteliiclass/screens/manageClasses.dart';
 import 'package:inteliiclass/screens/studentClassDetails.dart';
-import 'package:inteliiclass/providers/assignment_provider.dart';
 import 'package:inteliiclass/providers/class_provider.dart';
 import 'package:inteliiclass/providers/user_provider.dart';
 import 'package:inteliiclass/providers/attendance_provider.dart';
-import 'package:inteliiclass/providers/submission_provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -30,9 +24,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => ClassProvider()),
-        ChangeNotifierProvider(create: (_) => AssignmentProvider()),
         ChangeNotifierProvider(create: (_) => AttendanceProvider()),
-        ChangeNotifierProvider(create: (_) => SubmissionProvider()),
       ],
       child: MyApp(),
     ),
@@ -53,10 +45,6 @@ class MyApp extends StatelessWidget {
         '/studentdashboard': (context) => StudentDashboard(),
         '/classdetails': (context) => ClassDetails(),
         '/studentclassdetails': (context) => StudentClassDetails(),
-        '/assignmentlist': (context) => AssignmentList(),
-        '/assignmentdetails': (context) => AssignmentDetails(),
-        '/createassignment': (context) => CreateAssignment(),
-        '/submitassignment': (context) => SubmitAssignment(),
         '/attendance': (context) => AttendanceScreen(),
         '/manageclasses': (context) => ManageClasses(),
       },

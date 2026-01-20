@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:inteliiclass/providers/class_provider.dart';
-import 'package:inteliiclass/providers/user_provider.dart';
-import 'package:inteliiclass/providers/assignment_provider.dart';
 import 'package:inteliiclass/models/class_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 
 class ManageClasses extends StatefulWidget {
   const ManageClasses({super.key});
@@ -16,252 +13,102 @@ class ManageClasses extends StatefulWidget {
 }
 
 class _ManageClassesState extends State<ManageClasses> {
-  bool _isLoading = true;
 
   List<ClassModel> get _classesFromProvider {
     final provider = Provider.of<ClassProvider>(context, listen: false);
     return provider.classes;
   }
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      final classProvider = Provider.of<ClassProvider>(context, listen: false);
-      final assignmentProvider = Provider.of<AssignmentProvider>(
-        context,
-        listen: false,
-      );
-
-      if (userProvider.currentUser == null) {
-        await userProvider.autoLoginUser();
-      }
-
-      final instructorId =
-          userProvider.currentUser?.uid ??
-          FirebaseAuth.instance.currentUser?.uid;
-      if (instructorId != null) {
-        await classProvider.fetchClasses(instructorId: instructorId);
-        // Load assignments so we can show per-class counts
-        await assignmentProvider.fetchAssignments();
-      }
-
-      if (mounted) setState(() => _isLoading = false);
-    });
-  }
-
-  void _showCreateClassDialog() {
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController codeController = TextEditingController();
-    final TextEditingController subjectController = TextEditingController();
-    final TextEditingController descriptionController = TextEditingController();
-      }
-    
-
-  void _deleteClass(int index) {
-    final classProvider = Provider.of<ClassProvider>(context, listen: false);
-    final classData = _classesFromProvider[index];
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: const Color.fromARGB(255, 4, 48, 85),
-          title: Text(
-            'Delete Class',
-            style: GoogleFonts.poppins(color: Colors.white),
-          ),
-          content: Text(
-            'Are you sure you want to delete ${classData.className}?',
-            style: GoogleFonts.poppins(color: Colors.grey),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Cancel',
-                style: GoogleFonts.poppins(color: Colors.grey),
-              ),
-            ),
-            ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.red),
-              ),
-              onPressed: () async {
-                try {
-                  await classProvider.deleteClass(classData.classId);
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Class deleted successfully!'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                  setState(() {});
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Delete failed: $e'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              },
-              child: Text(
-                'Delete',
-                style: GoogleFonts.poppins(color: Colors.white),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   Widget _buildClassCard(int index, ClassModel classData) {
-    return Dismissible(
-      key: Key(classData.classId),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.red,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        alignment: Alignment.centerRight,
-        padding: EdgeInsets.only(right: 20),
-        child: Icon(Icons.delete, color: Colors.white, size: 30),
-      ),
-      onDismissed: (direction) async {
-        final classProvider = Provider.of<ClassProvider>(
-          context,
-          listen: false,
-        );
-        try {
-          await classProvider.deleteClass(classData.classId);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${classData.className} deleted'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Delete failed: $e'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, '/classdetails', arguments: classData);
       },
-      child: GestureDetector(
-        onTap: () {
-          Navigator.pushNamed(context, '/classdetails', arguments: classData);
-        },
-        child: Card(
-          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(Icons.class_, color: Colors.white, size: 30),
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            classData.className,
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16,
-                            ),
-                          ),
-                          Text(
-                            classData.classCode ?? '',
-                            style: GoogleFonts.poppins(
-                              color: Colors.grey,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(Icons.subject, color: Colors.grey, size: 16),
-                    const SizedBox(width: 4),
-                    Text(
-                      classData.subject,
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(
+                    child: Icon(Icons.class_, color: Colors.white, size: 30),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${classData.studentIds.length}',
+                          classData.className,
                           style: GoogleFonts.poppins(
-                            color: Colors.blue,
+                            color: Colors.white,
                             fontWeight: FontWeight.w700,
-                            fontSize: 20,
+                            fontSize: 16,
                           ),
                         ),
                         Text(
-                          'Students',
+                          classData.classCode ?? '',
                           style: GoogleFonts.poppins(
                             color: Colors.grey,
-                            fontSize: 12,
+                            fontSize: 14,
                           ),
                         ),
                       ],
                     ),
-                    Column(
-                      children: [
-                        Text(
-                          '${Provider.of<AssignmentProvider>(context).getAssignmentsByClassId(classData.classId).length}',
-                          style: GoogleFonts.poppins(
-                            color: Colors.amber,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 20,
-                          ),
-                        ),
-                        Text(
-                          'Assignments',
-                          style: GoogleFonts.poppins(
-                            color: Colors.grey,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
+                  ),
+                  
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Icon(Icons.subject, color: Colors.grey, size: 16),
+                  const SizedBox(width: 4),
+                  Text(
+                    classData.subject,
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 14,
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Column(
+                    children: [
+                      Text(
+                        '${classData.studentIds.length}',
+                        style: GoogleFonts.poppins(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 20,
+                        ),
+                      ),
+                      Text(
+                        'Students',
+                        style: GoogleFonts.poppins(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

@@ -131,9 +131,7 @@ class _SignInState extends State<Instructorlogin> {
                                   email: emailcontroller.text.trim(),
                                   password: passwordcontroller.text,
                                 );
-
-                            // Fetch user data after successful login
-                            if (context.mounted) {
+                            if (mounted) {
                               final userProvider = Provider.of<UserProvider>(
                                 context,
                                 listen: false,
@@ -147,7 +145,7 @@ class _SignInState extends State<Instructorlogin> {
                                 );
                               }
 
-                              if (context.mounted) {
+                              if (mounted) {
                                 Navigator.pushNamed(
                                   context,
                                   '/instructordashborad',
@@ -155,7 +153,7 @@ class _SignInState extends State<Instructorlogin> {
                               }
                             }
                           } catch (e) {
-                            if (context.mounted) {
+                            if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(e.toString())),
                               );

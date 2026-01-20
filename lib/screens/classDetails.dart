@@ -1,12 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inteliiclass/models/class_model.dart';
 import 'package:inteliiclass/models/user_model.dart';
-import 'package:inteliiclass/models/assignment_model.dart';
-import 'package:inteliiclass/providers/class_provider.dart';
-import 'package:inteliiclass/providers/assignment_provider.dart';
-import 'package:provider/provider.dart';
 
 class ClassDetails extends StatefulWidget {
   const ClassDetails({super.key});
@@ -19,77 +14,6 @@ class _ClassDetailsState extends State<ClassDetails> {
   ClassModel? _classModel;
   bool _isLoading = true;
   List<UserModel> _students = [];
-  List<AssignmentModel> _assignments = [];
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _loadData());
-  }
-
-  Future<void> _loadData() async {
-    final classProvider = Provider.of<ClassProvider>(context, listen: false);
-    final assignmentProvider = Provider.of<AssignmentProvider>(
-      context,
-      listen: false,
-    );
-
-    final args = ModalRoute.of(context)?.settings.arguments;
-    String? classId;
-    if (args is ClassModel) {
-      _classModel = args;
-      classId = _classModel!.classId;
-    } else if (args is String) {
-      classId = args;
-    }
-
-    if (_classModel == null && classId != null) {
-      await classProvider.fetchClasses();
-      _classModel = classProvider.getClassById(classId);
-    }
-
-    if (_classModel != null) {
-      await assignmentProvider.fetchAssignments(classId: _classModel!.classId);
-      _assignments = assignmentProvider.getAssignmentsByClassId(
-        _classModel!.classId,
-      );
-      await _loadStudents(_classModel!.studentIds);
-    }
-
-    if (mounted) setState(() => _isLoading = false);
-  }
-
-  Future<void> _loadStudents(List<String> ids) async {
-    _students = [];
-    final usersRef = FirebaseFirestore.instance.collection('users');
-
-    if (ids.isEmpty) return;
-
-    try {
-      if (ids.length <= 10) {
-        final snapshot = await usersRef.where('uid', whereIn: ids).get();
-        for (var doc in snapshot.docs) {
-          _students.add(UserModel.fromMap(doc.data() as Map<String, dynamic>));
-        }
-      } else {
-        for (final id in ids) {
-          final snapshot = await usersRef
-              .where('uid', isEqualTo: id)
-              .limit(1)
-              .get();
-          if (snapshot.docs.isNotEmpty) {
-            _students.add(
-              UserModel.fromMap(
-                snapshot.docs.first.data() as Map<String, dynamic>,
-              ),
-            );
-          }
-        }
-      }
-    } catch (_) {
-      // ignore errors, fallback will show ids
-    }
-  }
 
   Widget _buildStudentCard(UserModel? student, String id) {
     final displayName = student?.name ?? id;
@@ -136,37 +60,6 @@ class _ClassDetailsState extends State<ClassDetails> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAssignmentCard(AssignmentModel a) {
-    return GestureDetector(
-      onTap: () =>
-          Navigator.pushNamed(context, '/assignmentdetails', arguments: a),
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        child: ListTile(
-          leading: const Icon(Icons.assignment, color: Colors.amber, size: 30),
-          title: Text(
-            a.title,
-            style: GoogleFonts.poppins(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          subtitle: Text(
-            'Due: ${a.dueDate.toLocal().toString().split(' ')[0]}',
-            style: GoogleFonts.poppins(color: Colors.grey, fontSize: 12),
-          ),
-          trailing: Text(
-            '${a.totalMarks?.toInt() ?? 0} pts',
-            style: GoogleFonts.poppins(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
         ),
       ),
     );
@@ -292,7 +185,7 @@ class _ClassDetailsState extends State<ClassDetails> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                ..._classModel!.studentIds.map((id) {
+                ...(_classModel?.studentIds ?? []).map((id) {
                   final user = _students.firstWhere(
                     (u) => u.uid == id,
                     orElse: () => UserModel(
@@ -311,33 +204,6 @@ class _ClassDetailsState extends State<ClassDetails> {
                     id,
                   );
                 }).toList(),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Assignments (${_assignments.length})',
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.pushNamed(
-                          context,
-                          '/createassignment',
-                          arguments: _classModel?.classId,
-                        ),
-                        icon: const Icon(Icons.add, color: Colors.blue),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                ..._assignments.map(_buildAssignmentCard).toList(),
                 const SizedBox(height: 20),
               ],
             ),

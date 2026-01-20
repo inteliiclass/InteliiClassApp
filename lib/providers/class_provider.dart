@@ -16,11 +16,6 @@ class ClassProvider extends ChangeNotifier {
     return _classes.where((c) => c.instructorId == instructorId).toList();
   }
 
-  // Get classes by student ID
-  List<ClassModel> getClassesByStudentId(String studentId) {
-    return _classes.where((c) => c.studentIds.contains(studentId)).toList();
-  }
-
   // Fetch classes from Firestore
   Future<void> fetchClasses({String? instructorId, String? studentId}) async {
     _isLoading = true;
@@ -61,117 +56,7 @@ class ClassProvider extends ChangeNotifier {
     }
   }
 
-  // Add a new class
-  Future<void> addClass(ClassModel classModel) async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await FirebaseFirestore.instance
-          .collection('classes')
-          .doc(classModel.classId)
-          .set(classModel.toMap());
-
-      _classes.add(classModel);
-      _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      _errorMessage = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
-  }
-
-  // Update a class
-  Future<void> updateClass(ClassModel classModel) async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await FirebaseFirestore.instance
-          .collection('classes')
-          .doc(classModel.classId)
-          .update(classModel.toMap());
-
-      final index = _classes.indexWhere((c) => c.classId == classModel.classId);
-
-      if (index != -1) {
-        _classes[index] = classModel;
-      }
-
-      _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      _errorMessage = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
-  }
-
-  // Delete a class
-  Future<void> deleteClass(String classId) async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await FirebaseFirestore.instance
-          .collection('classes')
-          .doc(classId)
-          .delete();
-
-      _classes.removeWhere((c) => c.classId == classId);
-      _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      _errorMessage = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
-  }
-
-  // Add student to class
-  Future<void> addStudentToClass(String classId, String studentId) async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await FirebaseFirestore.instance
-          .collection('classes')
-          .doc(classId)
-          .update({
-            'studentIds': FieldValue.arrayUnion([studentId]),
-          });
-
-      final index = _classes.indexWhere((c) => c.classId == classId);
-      if (index != -1) {
-        final updatedClass = ClassModel(
-          classId: _classes[index].classId,
-          className: _classes[index].className,
-          description: _classes[index].description,
-          instructorId: _classes[index].instructorId,
-          instructorName: _classes[index].instructorName,
-          studentIds: [..._classes[index].studentIds, studentId],
-          subject: _classes[index].subject,
-          classCode: _classes[index].classCode,
-          createdAt: _classes[index].createdAt,
-          updatedAt: DateTime.now(),
-        );
-        _classes[index] = updatedClass;
-      }
-
-      _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      _errorMessage = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
-  }
-
+  
   // Get a single class by ID
   ClassModel? getClassById(String classId) {
     try {
@@ -221,7 +106,7 @@ class ClassProvider extends ChangeNotifier {
 
       if (q.docs.isNotEmpty) {
         final classModel = ClassModel.fromMap(
-          q.docs.first.data() as Map<String, dynamic>,
+          q.docs.first.data(),
         );
         final index = _classes.indexWhere(
           (c) => c.classId == classModel.classId,
@@ -248,37 +133,4 @@ class ClassProvider extends ChangeNotifier {
     }
   }
 
-  // Clear all classes
-  void clearClasses() {
-    _classes.clear();
-    notifyListeners();
-  }
-
-  // Increment an assignments counter field on the class document (if present)
-  Future<void> incrementAssignmentsCount(String classId, int delta) async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await FirebaseFirestore.instance
-          .collection('classes')
-          .doc(classId)
-          .update({'assignments': FieldValue.increment(delta)});
-
-      // Optionally refresh cached class
-      final index = _classes.indexWhere((c) => c.classId == classId);
-      if (index != -1) {
-        final refreshed = await fetchClassById(classId);
-        if (refreshed != null) _classes[index] = refreshed;
-      }
-
-      _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      _errorMessage = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
-  }
 }

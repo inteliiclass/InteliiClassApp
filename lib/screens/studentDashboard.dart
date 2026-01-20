@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inteliiclass/models/class_model.dart';
-import 'package:inteliiclass/models/assignment_model.dart';
 import 'package:provider/provider.dart';
 import 'package:inteliiclass/providers/class_provider.dart';
-import 'package:inteliiclass/providers/assignment_provider.dart';
 import 'package:inteliiclass/providers/user_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -98,74 +96,13 @@ class _StudentDashboardState extends State<StudentDashboard> {
     );
   }
 
-  Widget buildAssignmentCard(AssignmentModel assignment) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, '/submitassignment');
-      },
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Icon(Icons.assignment, color: Colors.amber, size: 40),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      assignment.title,
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "Due: ${assignment.dueDate.toString().split(' ')[0]}",
-                      style: GoogleFonts.poppins(
-                        color: Colors.grey,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.orange,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Pending',
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
+ 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       final classProvider = Provider.of<ClassProvider>(context, listen: false);
-      final assignmentProvider = Provider.of<AssignmentProvider>(
-        context,
-        listen: false,
-      );
 
       Future<void> fetchAll() async {
         if (userProvider.currentUser != null) {
@@ -181,8 +118,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
             );
           }
         }
-        // After classes are loaded, fetch assignments once (all) so we can filter locally
-        await assignmentProvider.fetchAssignments();
+       
       }
 
       await fetchAll();
@@ -193,12 +129,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final classProvider = Provider.of<ClassProvider>(context);
-    final assignmentProvider = Provider.of<AssignmentProvider>(context);
-    // Gather all assignments for the student's classes
-    final studentClassIds = classProvider.classes.map((c) => c.classId).toSet();
-    final assignments = assignmentProvider.assignments
-        .where((a) => studentClassIds.contains(a.classId))
-        .toList();
+  
     return Scaffold(
       backgroundColor: const Color(0xFF0B1220),
       body: ListView(
@@ -282,41 +213,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
                   itemCount: classProvider.classes.length,
                   itemBuilder: (context, index) {
                     return buildClassCard(classProvider.classes[index]);
-                  },
-                ),
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Text(
-              "Upcoming Assignments",
-              style: GoogleFonts.poppins(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: 20,
-              ),
-            ),
-          ),
-          assignmentProvider.isLoading
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: CircularProgressIndicator(color: Colors.amber),
-                  ),
-                )
-              : assignments.isEmpty
-              ? Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Text(
-                    'No upcoming assignments',
-                    style: GoogleFonts.poppins(color: Colors.grey),
-                  ),
-                )
-              : ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: assignments.length,
-                  itemBuilder: (context, index) {
-                    return buildAssignmentCard(assignments[index]);
                   },
                 ),
           const SizedBox(height: 20),
