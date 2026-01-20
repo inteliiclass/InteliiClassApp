@@ -108,8 +108,9 @@ class _SignInState extends State<Studentlogin> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Enter your Password";
-                        } else
+                        } else {
                           return null;
+                        }
                       },
                       onChanged: (value) {
                         setState(() {

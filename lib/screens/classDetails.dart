@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inteliiclass/models/class_model.dart';
 import 'package:inteliiclass/models/user_model.dart';
+import 'package:provider/provider.dart';
+import 'package:inteliiclass/providers/user_provider.dart';
 
 class ClassDetails extends StatefulWidget {
   const ClassDetails({super.key});
@@ -13,7 +15,41 @@ class ClassDetails extends StatefulWidget {
 class _ClassDetailsState extends State<ClassDetails> {
   ClassModel? _classModel;
   bool _isLoading = true;
-  List<UserModel> _students = [];
+  final List<UserModel> _students = [];
+  late UserProvider _userProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    _userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is ClassModel) {
+        setState(() {
+          _classModel = args;
+          _isLoading = false;
+        });
+        _fetchStudents();
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
+  }
+
+  Future<void> _fetchStudents() async {
+    if (_classModel != null && _classModel!.studentIds.isNotEmpty) {
+      final students = await _userProvider.fetchUsersByIds(_classModel!.studentIds);
+      if (mounted) {
+        setState(() {
+          _students.clear();
+          _students.addAll(students);
+        });
+      }
+    }
+  }
 
   Widget _buildStudentCard(UserModel? student, String id) {
     final displayName = student?.name ?? id;
@@ -72,7 +108,7 @@ class _ClassDetailsState extends State<ClassDetails> {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 4, 48, 85),
         title: Text(
-          _classModel?.className ?? 'Class Details',
+          'Class Details',
           style: GoogleFonts.poppins(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -173,37 +209,32 @@ class _ClassDetailsState extends State<ClassDetails> {
                           fontSize: 18,
                         ),
                       ),
-                      IconButton(
-                        onPressed: () => Navigator.pushNamed(
-                          context,
-                          '/manageclasses',
-                          arguments: _classModel?.classId,
-                        ),
-                        icon: const Icon(Icons.add, color: Colors.blue),
-                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 8),
-                ...(_classModel?.studentIds ?? []).map((id) {
-                  final user = _students.firstWhere(
-                    (u) => u.uid == id,
-                    orElse: () => UserModel(
-                      uid: id,
-                      email: '',
-                      name: id,
-                      role: 'student',
-                      phoneNumber: null,
-                      profileImageUrl: null,
-                      createdAt: DateTime.now(),
-                      updatedAt: DateTime.now(),
-                    ),
-                  );
-                  return _buildStudentCard(
-                    user.uid == id && user.email == '' ? null : user,
-                    id,
-                  );
-                }).toList(),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _classModel?.studentIds?.length ?? 0,
+                  itemBuilder: (context, index) {
+                    final id = _classModel!.studentIds![index];
+                    final user = _students.firstWhere(
+                          (u) => u.uid == id,
+                      orElse: () => UserModel(
+                        uid: id,
+                        email: 'Loading...',
+                        name: 'Loading...',
+                        role: 'student',
+                        phoneNumber: null,
+                        profileImageUrl: null,
+                        createdAt: DateTime.now(),
+                        updatedAt: DateTime.now(),
+                      ),
+                    );
+                    return _buildStudentCard(user, id);
+                  },
+                ),
                 const SizedBox(height: 20),
               ],
             ),

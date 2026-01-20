@@ -68,7 +68,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                   const SizedBox(width: 4),
                   Flexible(
                     child: Text(
-                      "Dr." + " " + classData.instructorName,
+                      "Dr." " " + classData.instructorName,
                       style: GoogleFonts.poppins(
                         color: Colors.white,
                         fontSize: 14,
@@ -170,13 +170,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
                   ),
                 ),
                 Spacer(),
-                Container(
-                  alignment: Alignment.bottomRight,
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.notifications, color: Colors.white),
-                  ),
-                ),
               ],
             ),
           ),
@@ -212,7 +205,85 @@ class _StudentDashboardState extends State<StudentDashboard> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: classProvider.classes.length,
                   itemBuilder: (context, index) {
-                    return buildClassCard(classProvider.classes[index]);
+                    return  GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/studentclassdetails',
+                          arguments: classProvider.classes[index],
+                        );
+                      },
+                      child: Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 50,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Icon(Icons.book, color: Colors.white, size: 30),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          classProvider.classes[index].className,
+                                          style: GoogleFonts.poppins(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 16,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Icon(Icons.person, color: Colors.grey, size: 16),
+                                  const SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      "Dr." " " + classProvider.classes[index].instructorName,
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Icon(Icons.subject, color: Colors.grey, size: 16),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    classProvider.classes[index].subject,
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
                   },
                 ),
           const SizedBox(height: 20),

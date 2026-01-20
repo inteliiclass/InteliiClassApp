@@ -48,7 +48,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       // Load instructor classes (if any)
       String? instructorId =
           userProvider.currentUser?.uid ??
-          FirebaseAuth.instance.currentUser?.uid;
+              FirebaseAuth.instance.currentUser?.uid;
       if (instructorId != null) {
         await classProvider.fetchClasses(instructorId: instructorId);
         _availableClasses = classProvider.getClassesByInstructorId(
@@ -99,11 +99,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Future<void> _loadClassData(
-    String classId,
-    ClassProvider classProvider,
-    AttendanceProvider attendanceProvider,
-    UserProvider userProvider,
-  ) async {
+      String classId,
+      ClassProvider classProvider,
+      AttendanceProvider attendanceProvider,
+      UserProvider userProvider,
+      ) async {
     setState(() {
       _isLoading = true;
       _students = {};
@@ -133,15 +133,15 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         .getAttendanceByClassId(_classModel!.classId)
         .where(
           (a) =>
-              a.date.year == today.year &&
-              a.date.month == today.month &&
-              a.date.day == today.day,
-        )
+      a.date.year == today.year &&
+          a.date.month == today.month &&
+          a.date.day == today.day,
+    )
         .toList();
 
     for (final sid in _classModel!.studentIds) {
       final record = classAttendances.firstWhere(
-        (a) => a.studentId == sid,
+            (a) => a.studentId == sid,
         orElse: () => AttendanceModel(
           attendanceId: '',
           classId: _classModel!.classId,
@@ -203,20 +203,29 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     final displayName = _students[studentId]?.name ?? studentId;
     final email = _students[studentId]?.email ?? '';
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 17),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                CircleAvatar(
-                  backgroundColor: Colors.blue,
-                  child: Text(
-                    displayName.isNotEmpty ? displayName[0] : 'S',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: Text(
+                      displayName.isNotEmpty ? displayName[0].toUpperCase() : 'S',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
                     ),
                   ),
                 ),
@@ -229,20 +238,17 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                         displayName,
                         style: GoogleFonts.poppins(
                           color: Colors.white,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                           fontSize: 16,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                      if (email.isNotEmpty)
-                        Text(
-                          email,
-                          style: GoogleFonts.poppins(
-                            color: Colors.grey,
-                            fontSize: 12,
-                          ),
+                      Text(
+                        email,
+                        style: GoogleFonts.poppins(
+                          color: Colors.grey,
+                          fontSize: 14,
                         ),
+                      ),
                     ],
                   ),
                 ),
@@ -373,304 +379,343 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Column(
+      body: ListView(
+        padding: EdgeInsets.fromLTRB(0, 16, 0, 16),
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             child: _isLoading
                 ? SizedBox(
-                    height: 48,
-                    child: Center(child: CircularProgressIndicator()),
-                  )
+              height: 48,
+              child: Center(child: CircularProgressIndicator()),
+            )
                 : (_availableClasses.isEmpty
-                      ? SizedBox(
-                          height: 48,
-                          child: Row(
+                ? SizedBox(
+              height: 48,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'No classes available',
+                      style: GoogleFonts.poppins(
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () async {
+                      setState(() => _isLoading = true);
+                      final userProvider =
+                      Provider.of<UserProvider>(
+                        context,
+                        listen: false,
+                      );
+                      final classProvider =
+                      Provider.of<ClassProvider>(
+                        context,
+                        listen: false,
+                      );
+                      final instructorId =
+                          userProvider.currentUser?.uid;
+                      if (instructorId != null) {
+                        await classProvider.fetchClasses(
+                          instructorId: instructorId,
+                        );
+                        _availableClasses = classProvider
+                            .getClassesByInstructorId(instructorId);
+                        if (_availableClasses.isNotEmpty) {
+                          _selectedClassId =
+                              _availableClasses.first.classId;
+                          final attendanceProvider =
+                          Provider.of<AttendanceProvider>(
+                            context,
+                            listen: false,
+                          );
+                          final userProv =
+                          Provider.of<UserProvider>(
+                            context,
+                            listen: false,
+                          );
+                          await _loadClassData(
+                            _selectedClassId!,
+                            classProvider,
+                            attendanceProvider,
+                            userProv,
+                          );
+                        }
+                      }
+                      if (mounted) {
+                        setState(() => _isLoading = false);
+                      }
+                    },
+                    child: Text(
+                      'Reload',
+                      style: GoogleFonts.poppins(),
+                    ),
+                  ),
+                ],
+              ),
+            )
+                : DropdownButtonFormField<String>(
+              isExpanded: true,
+              value: _selectedClassId,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: const Color.fromARGB(255, 2, 20, 34),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
+              ),
+              dropdownColor: const Color.fromARGB(255, 2, 20, 34),
+              style: GoogleFonts.poppins(color: Colors.white),
+              hint: Text(
+                'Select class',
+                style: GoogleFonts.poppins(color: Colors.grey),
+              ),
+              items: _availableClasses
+                  .map(
+                    (c) => DropdownMenuItem(
+                  value: c.classId,
+                  child: Text(c.className),
+                ),
+              )
+                  .toList(),
+              onChanged: (val) async {
+                if (val == null) return;
+                setState(() => _selectedClassId = val);
+                final classProvider = Provider.of<ClassProvider>(
+                  context,
+                  listen: false,
+                );
+                final attendanceProvider =
+                Provider.of<AttendanceProvider>(
+                  context,
+                  listen: false,
+                );
+                final userProvider = Provider.of<UserProvider>(
+                  context,
+                  listen: false,
+                );
+                await _loadClassData(
+                  val,
+                  classProvider,
+                  attendanceProvider,
+                  userProvider,
+                );
+              },
+            )),
+          ),
+          const SizedBox(height: 8),
+          if (_classModel != null)
+            Card(
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(Icons.class_, color: Colors.white, size: 30),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: Text(
-                                  'No classes available',
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.grey,
-                                  ),
+                              Text(
+                                _classModel!.className,
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16,
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              ElevatedButton(
-                                onPressed: () async {
-                                  setState(() => _isLoading = true);
-                                  final userProvider =
-                                      Provider.of<UserProvider>(
-                                        context,
-                                        listen: false,
-                                      );
-                                  final classProvider =
-                                      Provider.of<ClassProvider>(
-                                        context,
-                                        listen: false,
-                                      );
-                                  final instructorId =
-                                      userProvider.currentUser?.uid ??
-                                      FirebaseAuth.instance.currentUser?.uid;
-                                  if (instructorId != null) {
-                                    await classProvider.fetchClasses(
-                                      instructorId: instructorId,
-                                    );
-                                    _availableClasses = classProvider
-                                        .getClassesByInstructorId(instructorId);
-                                    if (_availableClasses.isNotEmpty) {
-                                      _selectedClassId =
-                                          _availableClasses.first.classId;
-                                      final attendanceProvider =
-                                          Provider.of<AttendanceProvider>(
-                                            context,
-                                            listen: false,
-                                          );
-                                      final userProv =
-                                          Provider.of<UserProvider>(
-                                            context,
-                                            listen: false,
-                                          );
-                                      await _loadClassData(
-                                        _selectedClassId!,
-                                        classProvider,
-                                        attendanceProvider,
-                                        userProv,
-                                      );
-                                    }
-                                  }
-                                  if (mounted)
-                                    setState(() => _isLoading = false);
-                                },
-                                child: Text(
-                                  'Reload',
-                                  style: GoogleFonts.poppins(),
+                              Text(
+                                _classModel!.classCode ?? '',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.grey,
+                                  fontSize: 14,
                                 ),
                               ),
                             ],
                           ),
-                        )
-                      : DropdownButtonFormField<String>(
-                          isExpanded: true,
-                          value: _selectedClassId,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: const Color.fromARGB(255, 2, 20, 34),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 4,
-                            ),
-                          ),
-                          dropdownColor: const Color.fromARGB(255, 2, 20, 34),
-                          style: GoogleFonts.poppins(color: Colors.white),
-                          hint: Text(
-                            'Select class',
-                            style: GoogleFonts.poppins(color: Colors.grey),
-                          ),
-                          items: _availableClasses
-                              .map(
-                                (c) => DropdownMenuItem(
-                                  value: c.classId,
-                                  child: Text(c.className),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (val) async {
-                            if (val == null) return;
-                            setState(() => _selectedClassId = val);
-                            final classProvider = Provider.of<ClassProvider>(
-                              context,
-                              listen: false,
-                            );
-                            final attendanceProvider =
-                                Provider.of<AttendanceProvider>(
-                                  context,
-                                  listen: false,
-                                );
-                            final userProvider = Provider.of<UserProvider>(
-                              context,
-                              listen: false,
-                            );
-                            await _loadClassData(
-                              val,
-                              classProvider,
-                              attendanceProvider,
-                              userProvider,
-                            );
-                          },
-                        )),
-          ),
-          Card(
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Container(
-                    width: 78,
-                    height: 78,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 2, 20, 34),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: const Center(
-                      child: Icon(Icons.school, color: Colors.white, size: 40),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _classModel?.className ?? 'Class',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 18,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 6),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Icon(Icons.subject, color: Colors.grey, size: 16),
+                        const SizedBox(width: 4),
                         Text(
-                          _classModel?.subject ?? '',
+                          _classModel!.subject,
                           style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontSize: 14,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Date: ${DateTime.now().toString().split(' ')[0]}',
-                          style: GoogleFonts.poppins(color: Colors.grey),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Column(
+                          children: [
+                            Text(
+                              '${_countStatus('present')}',
+                              style: GoogleFonts.poppins(
+                                color: Colors.green,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 20,
+                              ),
+                            ),
+                            Text(
+                              'Present',
+                              style: GoogleFonts.poppins(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            Text(
+                              '${_countStatus('absent')}',
+                              style: GoogleFonts.poppins(
+                                color: Colors.red,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 20,
+                              ),
+                            ),
+                            Text(
+                              'Absent',
+                              style: GoogleFonts.poppins(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            Text(
+                              '${_countStatus('late')}',
+                              style: GoogleFonts.poppins(
+                                color: Colors.orange,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 20,
+                              ),
+                            ),
+                            Text(
+                              'Late',
+                              style: GoogleFonts.poppins(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Column(
-                    children: [
-                      Text(
-                        '${_countStatus('present')}',
-                        style: GoogleFonts.poppins(
-                          color: Colors.green,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 24,
-                        ),
-                      ),
-                      Text(
-                        'Present',
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Text(
-                        '${_countStatus('absent')}',
-                        style: GoogleFonts.poppins(
-                          color: Colors.red,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 24,
-                        ),
-                      ),
-                      Text(
-                        'Absent',
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Text(
-                        '${_countStatus('late')}',
-                        style: GoogleFonts.poppins(
-                          color: Colors.orange,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 24,
-                        ),
-                      ),
-                      Text(
-                        'Late',
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            child: _classModel == null
-                ? Center(
-                    child: Text(
+          const SizedBox(height: 8),
+          if (_classModel == null)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(40),
+                child: Column(
+                  children: [
+                    Icon(Icons.assignment, color: Colors.grey, size: 80),
+                    const SizedBox(height: 16),
+                    Text(
                       'No class selected',
-                      style: GoogleFonts.poppins(color: Colors.grey),
+                      style: GoogleFonts.poppins(
+                        color: Colors.grey,
+                        fontSize: 18,
+                      ),
                     ),
-                  )
-                : Container(
-                    margin: EdgeInsets.fromLTRB(0, 17, 0, 0),
-                    child: ListView.builder(
-                      itemCount: _classModel!.studentIds.length,
-                      itemBuilder: (context, index) {
-                        final sid = _classModel!.studentIds[index];
-                        return _buildStudentCard(sid);
-                      },
+                  ],
+                ),
+              ),
+            )
+          else if (_classModel!.studentIds.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(40),
+                child: Column(
+                  children: [
+                    Icon(Icons.people_outline, color: Colors.grey, size: 80),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No students in this class',
+                      style: GoogleFonts.poppins(
+                        color: Colors.grey,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _classModel!.studentIds.length,
+              itemBuilder: (context, index) {
+                final sid = _classModel!.studentIds[index];
+                return _buildStudentCard(sid);
+              },
+            ),
+          const SizedBox(height: 16),
+          if (_classModel != null && _classModel!.studentIds.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all(Colors.blue),
+                    shape: WidgetStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.blue),
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                  onPressed: _isLoading ? null : _saveAttendance,
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(
+                    'Save Attendance',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
-                onPressed: _isLoading ? null : _saveAttendance,
-                child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : Text(
-                        'Save Attendance',
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
               ),
             ),
-          ),
         ],
       ),
     );
